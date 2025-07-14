@@ -1,53 +1,3 @@
-// const express=require('express')
-// const app=express()
-// const bodyparser=require('body-parser')
-// const cookieParser=require('cookie-parser')
-// const cors=require('cors')
-
-// const dotenv=require('dotenv');
-// dotenv.config();
-// const port=process.env.PORT
-// require('./db')
-// const allowedOrigin=[process.env.FRONTEND_URL];
-//  // only this origin can access my backend while hosting add google.com
-// app.use(
-//     cors({
-//         origin:function (origin,callback){
-//             if(!origin || allowedOrigin.includes(origin)){
-//                 callback(null,true);
-//             }else{
-//                 callback(new Error("Not allowed by CORS"));
-//             }
-//         },
-//         credentials:true
-//     })
-// )
-// app.use(bodyparser.json());
-// app.use(cookieParser(
-//     {
-//        httpOnly:true,
-//        secure:true,
-//        sameSite:'none',
-//        maxAge:1000*60*60*24*7,
-//        signed:true 
-//     }
-// ));
-
-// const authRoutes=require('./routes/authRoutes')
-// // const classroomRoutes=require('./routes/classroomRoutes')
-
-// app.use('/auth',authRoutes)
-// // app.use('/class',classroomRoutes)
-
-// app.get('/',(req,res)=>{
-//     res.send('Hello world');
-// })
-// app.get('/getuserdata',(req,res)=>{
-//     res.send('Abhay singh,22,Male')
-// })
-// app.listen(port,()=>{
-//     console.log(`App running on port ${port}`)
-// })
 const express = require('express');
 const app = express();
 const bodyparser = require('body-parser');
@@ -64,8 +14,6 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:3000', 
   'http://10.35.142.38:3000'
-  // Include local development
-  //'https://your-production-domain.com' // Add your production domain
 ].filter(Boolean); // Remove any undefined values
 
 // Enhanced CORS configuration

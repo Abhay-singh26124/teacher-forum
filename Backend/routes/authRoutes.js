@@ -3,10 +3,9 @@ const User=require('../models/userModel')
 const Verification=require('../models/verificationModel')
 const responseFunction=require('../utils/responseFunction')
 const nodemailer=require('nodemailer')
-const dotenv=require('dotenv')
-dotenv.config();
+
 const router=express.Router();
-const bcrypt=require('bcrypt')   // to decode the password
+const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken')
 const authTokenHandler=require('../middleware/checkAuthToken')
 
@@ -15,13 +14,13 @@ const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 24 * 60 * 60 * 1000 // 1 day
+    maxAge: 24 * 60 * 60 * 1000
 };
 const mailer = async (receiverMail, code) => {
     try {
-        // 1. Fix transporter configuration
+        
         let transporter = nodemailer.createTransport({
-            service: 'gmail',  // Use 'service' instead of manual host/port
+            service: 'gmail',
             auth: {
                 user: process.env.COMPANY_EMAIL,
                 pass: process.env.GMAIL_APP_PASSWORD

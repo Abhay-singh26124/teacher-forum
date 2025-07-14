@@ -18,8 +18,8 @@ const mailer = async (receiverMail, subject, text, html) => {
               user: process.env.COMPANY_EMAIL,
               pass: process.env.GMAIL_APP_PASSWORD
           },
-          logger: true, // Enable logging
-          debug: true // Enable debug output
+          logger: true,
+          debug: true
       });
 
       let info = await transporter.sendMail({
@@ -38,7 +38,7 @@ const mailer = async (receiverMail, subject, text, html) => {
 
   } catch (error) {
       console.error('Mailer error:', error);
-      throw error; // Re-throw to handle in the route
+      throw error;
   }
 };
 router.post('/create',authTokenHandler,async(req,res)=>{
@@ -50,7 +50,7 @@ router.post('/create',authTokenHandler,async(req,res)=>{
   const newClassroom=new Classroom({
     name,
     description,
-    owner:req.userId // set the owner to the current user
+    owner:req.userId
   })
   await newClassroom.save();
   return responseFunction(res,201,'Classroom created successfully',newClassroom,true);
@@ -99,7 +99,7 @@ router.post('/addpost',authTokenHandler,async(req,res)=>{
     });
     await newPost.save();
 
-    // adding post to classroom's posts array
+    
     classroom.posts.push(newPost._id);
     await classroom.save();
     res.status(201).json({message:'Post created successfully',post:newPost})
@@ -133,14 +133,14 @@ router.post('/request-to-join', async (req, res) => {
   try {
       const { classroomId, studentEmail } = req.body;
       
-      // Validate input
+      
       if (!classroomId || !studentEmail) {
           return responseFunction(res, 400, 'Classroom ID and student email are required', null, false);
       }
 
-      // Find classroom with owner's email populated
+      
       const classroom = await Classroom.findById(classroomId)
-          .populate('owner', 'email'); // Only get the email field
+          .populate('owner', 'email');
 
       if (!classroom) {
           return responseFunction(res, 404, 'Classroom not found', null, false);
@@ -150,13 +150,13 @@ router.post('/request-to-join', async (req, res) => {
           return responseFunction(res, 400, 'Classroom owner email not found', null, false);
       }
 
-      // Generate OTP
+      
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const ownerEmail = classroom.owner.email;
 
       console.log(`Attempting to send OTP to: ${ownerEmail}`);
 
-      // Send OTP via email
+      
       try {
           const emailSent = await mailer(
               ownerEmail,
@@ -174,7 +174,7 @@ router.post('/request-to-join', async (req, res) => {
           return responseFunction(res, 500, 'Failed to send OTP email', null, false);
       }
 
-      // Save the join request
+      
       const joinRequest = new ClassroomJoin({
           classroomId: classroom._id,
           classroomOwner: classroom.owner._id,
@@ -186,7 +186,7 @@ router.post('/request-to-join', async (req, res) => {
 
       return responseFunction(res, 200, 'OTP sent to teacher', { 
           requestId: joinRequest._id,
-          ownerEmail: ownerEmail // For debugging
+          ownerEmail: ownerEmail
       }, true);
 
   } catch (error) {
@@ -199,12 +199,12 @@ router.post('/verify-otp', authTokenHandler, async (req, res) => {
   try {
     const { classroomId, studentEmail, otp } = req.body;
 
-    // Validate input
+    
     if (!classroomId || !studentEmail || !otp) {
       return responseFunction(res, 400, 'All fields are required', null, false);
     }
 
-    // Find and validate the join request
+    
     const joinRequest = await ClassroomJoin.findOne({
       classroomId,
       studentEmail,
@@ -215,10 +215,10 @@ router.post('/verify-otp', authTokenHandler, async (req, res) => {
       return responseFunction(res, 400, 'Invalid OTP or request', null, false);
     }
 
-    // Update classroom
+    
     const classroom = await Classroom.findByIdAndUpdate(
       classroomId,
-      { $addToSet: { students: studentEmail } }, // Use email string
+      { $addToSet: { students: studentEmail } },
       { new: true }
     );
 
@@ -226,7 +226,7 @@ router.post('/verify-otp', authTokenHandler, async (req, res) => {
       return responseFunction(res, 404, 'Classroom not found', null, false);
     }
 
-    // Clean up
+
     await ClassroomJoin.deleteOne({ _id: joinRequest._id });
 
     return responseFunction(res, 200, 'Successfully joined class', null, true);
